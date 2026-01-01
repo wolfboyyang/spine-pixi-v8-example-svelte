@@ -20,19 +20,21 @@
         document.body.appendChild(app.canvas);
 
         // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
-        Assets.add({ alias: "spineboyData", src: "/assets/spineboy-pro.skel" });
+        Assets.add({ alias: "spineboyData", src: "/assets/coin-pro.skel" });
         Assets.add({
             alias: "spineboyAtlas",
-            src: "/assets/spineboy-pro.atlas",
+            src: "/assets/coin-pma.atlas",
         });
         await Assets.load(["spineboyData", "spineboyAtlas"]);
 
         // Create the spine display object
         const spineboy = Spine.from({
-            atlas: "spineboyAtlas",
             skeleton: "spineboyData",
-            scale: 0.5,
+            atlas: "spineboyAtlas",
+            scale: 1,
+            // darkTint: true,
         });
+        spineboy.autoUpdate = false;
 
         // Set the default mix time to use when transitioning
         // from one animation to the next.
@@ -40,14 +42,18 @@
 
         // Center the spine object on screen.
         spineboy.x = window.innerWidth / 2;
-        spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
+        spineboy.y = window.innerHeight / 2;
 
-        // Set animation "cape-follow-example" on track 0, looped.
-        spineboy.state.setAnimation(0, "run", true);
+        // Set animation "run" on track 0, looped.
+        spineboy.state.setAnimation(0, "animation", true);
 
         // Add the display object to the stage.
         app.stage.addChild(spineboy);
+
+        app.ticker.add((_delta) => {
+            spineboy.update(_delta.deltaTime / 100);
+        });
     });
 </script>
 
-<h1>SpineBoy with Pixi.js & SvelteKit</h1>
+<h1>Coin</h1>

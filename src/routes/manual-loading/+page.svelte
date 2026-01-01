@@ -1,6 +1,10 @@
 <script lang="ts">
     import { Application, Assets } from "pixi.js";
-    import { Spine } from "@esotericsoftware/spine-pixi-v8";
+    import {
+        Spine,
+        AtlasAttachmentLoader,
+        SkeletonBinary,
+    } from "@esotericsoftware/spine-pixi-v8";
     import { onMount } from "svelte";
 
     const app = new Application();
@@ -27,12 +31,17 @@
         });
         await Assets.load(["spineboyData", "spineboyAtlas"]);
 
-        // Create the spine display object
-        const spineboy = Spine.from({
-            atlas: "spineboyAtlas",
-            skeleton: "spineboyData",
-            scale: 0.5,
-        });
+        // Manually load the data and create a Spine display object from it using
+        // the Spine core API. This will not use the interal cache like Spine.from(),
+        // so you have to cache data yourself.
+        const atlas = Assets.get("spineboyAtlas");
+        const attachmentLoader = new AtlasAttachmentLoader(atlas);
+        const binaryLoader = new SkeletonBinary(attachmentLoader);
+        binaryLoader.scale = 0.5;
+        const skeletonData = binaryLoader.readSkeletonData(
+            Assets.get("spineboyData"),
+        );
+        const spineboy = new Spine(skeletonData);
 
         // Set the default mix time to use when transitioning
         // from one animation to the next.

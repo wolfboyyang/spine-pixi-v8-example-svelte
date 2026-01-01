@@ -20,34 +20,27 @@
         document.body.appendChild(app.canvas);
 
         // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
-        Assets.add({ alias: "spineboyData", src: "/assets/spineboy-pro.skel" });
-        Assets.add({
-            alias: "spineboyAtlas",
-            src: "/assets/spineboy-pro.atlas",
-        });
-        await Assets.load(["spineboyData", "spineboyAtlas"]);
+        Assets.add({ alias: "sackData", src: "/assets/sack-pro.skel" });
+        Assets.add({ alias: "sackAtlas", src: "/assets/sack-pma.atlas" });
+        await Assets.load(["sackData", "sackAtlas"]);
 
         // Create the spine display object
-        const spineboy = Spine.from({
-            atlas: "spineboyAtlas",
-            skeleton: "spineboyData",
-            scale: 0.5,
+        const sack = Spine.from({
+            skeleton: "sackData",
+            atlas: "sackAtlas",
+            scale: 0.2,
         });
 
-        // Set the default mix time to use when transitioning
-        // from one animation to the next.
-        spineboy.state.data.defaultMix = 0.2;
-
         // Center the spine object on screen.
-        spineboy.x = window.innerWidth / 2;
-        spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
+        sack.x = window.innerWidth / 2;
+        sack.y = window.innerHeight / 2 + sack.getBounds().height / 2;
 
         // Set animation "cape-follow-example" on track 0, looped.
-        spineboy.state.setAnimation(0, "run", true);
+        sack.state.setAnimation(0, "cape-follow-example", true);
 
         // Add the display object to the stage.
-        app.stage.addChild(spineboy);
+        app.stage.addChild(sack);
     });
 </script>
 
-<h1>SpineBoy with Pixi.js & SvelteKit</h1>
+<h1>Physics</h1>

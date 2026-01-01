@@ -3,7 +3,13 @@
     import { Spine } from "@esotericsoftware/spine-pixi-v8";
     import { onMount } from "svelte";
 
+    let message: string[] = $state([]);
     const app = new Application();
+
+    function log(text: string) {
+        message.push(text);
+        console.log(text);
+    }
 
     onMount(async () => {
         await app.init({
@@ -42,12 +48,42 @@
         spineboy.x = window.innerWidth / 2;
         spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
 
-        // Set animation "cape-follow-example" on track 0, looped.
+        // Set animation "run" on track 0, looped.
         spineboy.state.setAnimation(0, "run", true);
+
+        // Set callbacks to receive animation state events.
+        spineboy.state.addListener({
+            start: (entry) => log(`Started animation ${entry.animation?.name}`),
+            interrupt: (entry) =>
+                log(`Interrupted animation ${entry.animation?.name}`),
+            end: (entry) => log(`Ended animation ${entry.animation?.name}`),
+            dispose: (entry) =>
+                log(`Disposed animation ${entry.animation?.name}`),
+            complete: (entry) =>
+                log(`Completed animation ${entry.animation?.name}`),
+        });
+
+        // Add a custom event listener along with an
+        // unlooped animation to see the custom event logged.
+        const trackEntry = spineboy.state.addAnimation(0, "walk", false, 3);
+        trackEntry.listener = {
+            event: (entry, event) =>
+                log(
+                    `Custom event for ${entry.animation?.name}: ${event.data.name}`,
+                ),
+        };
+
+        spineboy.state.addAnimation(0, "run", true, 0);
 
         // Add the display object to the stage.
         app.stage.addChild(spineboy);
     });
 </script>
 
-<h1>SpineBoy with Pixi.js & SvelteKit</h1>
+<h1>events</h1>
+<!-- Creates a transparent logging overlay. -->
+<div id="log" class="max-h-75 select-none overflow-auto scroll-auto">
+    {#each message as text}
+        {text}<br />
+    {/each}
+</div>

@@ -20,34 +20,68 @@
         document.body.appendChild(app.canvas);
 
         // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
-        Assets.add({ alias: "spineboyData", src: "/assets/spineboy-pro.skel" });
+        Assets.add({
+            alias: "spineboyData",
+            src: "/assets/dragon-ess.skel",
+        });
         Assets.add({
             alias: "spineboyAtlas",
-            src: "/assets/spineboy-pro.atlas",
+            src: "/assets/dragon-ess.atlas",
         });
-        await Assets.load(["spineboyData", "spineboyAtlas"]);
+        Assets.add({
+            alias: "spineboyData2",
+            src: "/assets/dragon-ess.skel",
+        });
+        Assets.add({
+            alias: "spineboyAtlas2",
+            src: "/assets/dragon-ess.atlas",
+        });
+        await Assets.load([
+            "spineboyData",
+            "spineboyAtlas",
+            "spineboyData",
+            "spineboyAtlas2",
+        ]);
 
         // Create the spine display object
         const spineboy = Spine.from({
-            atlas: "spineboyAtlas",
             skeleton: "spineboyData",
+            atlas: "spineboyAtlas",
             scale: 0.5,
         });
+        const spineboy2 = Spine.from({
+            skeleton: "spineboyData",
+            atlas: "spineboyAtlas",
+            scale: 0.5,
+        });
+        spineboy.autoUpdate = false;
+        spineboy2.autoUpdate = false;
 
         // Set the default mix time to use when transitioning
         // from one animation to the next.
         spineboy.state.data.defaultMix = 0.2;
+        spineboy2.state.data.defaultMix = 0.2;
 
         // Center the spine object on screen.
         spineboy.x = window.innerWidth / 2;
-        spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
+        spineboy.y = window.innerHeight / 2 - 30;
 
-        // Set animation "cape-follow-example" on track 0, looped.
-        spineboy.state.setAnimation(0, "run", true);
+        spineboy2.x = window.innerWidth / 2;
+        spineboy2.y = window.innerHeight / 2 + 200;
+
+        // Set animation "run" on track 0, looped.
+        spineboy.state.setAnimation(0, "flying", true);
+        spineboy2.state.setAnimation(0, "flying", true);
 
         // Add the display object to the stage.
         app.stage.addChild(spineboy);
+        app.stage.addChild(spineboy2);
+
+        app.ticker.add((_delta) => {
+            spineboy.update(_delta.deltaTime / 100);
+            spineboy2.update(_delta.deltaTime / 100);
+        });
     });
 </script>
 
-<h1>SpineBoy with Pixi.js & SvelteKit</h1>
+<h1>Dragon</h1>

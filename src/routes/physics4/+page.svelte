@@ -20,34 +20,33 @@
         document.body.appendChild(app.canvas);
 
         // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
-        Assets.add({ alias: "spineboyData", src: "/assets/spineboy-pro.skel" });
         Assets.add({
-            alias: "spineboyAtlas",
-            src: "/assets/spineboy-pro.atlas",
+            alias: "cloudPotData",
+            src: "/assets/cloud-pot.skel",
         });
-        await Assets.load(["spineboyData", "spineboyAtlas"]);
+        Assets.add({
+            alias: "cloudPotAtlas",
+            src: "/assets/cloud-pot-pma.atlas",
+        });
+        await Assets.load(["cloudPotData", "cloudPotAtlas"]);
 
         // Create the spine display object
-        const spineboy = Spine.from({
-            atlas: "spineboyAtlas",
-            skeleton: "spineboyData",
-            scale: 0.5,
+        const cloudPot = Spine.from({
+            skeleton: "cloudPotData",
+            atlas: "cloudPotAtlas",
+            scale: 0.25,
         });
 
-        // Set the default mix time to use when transitioning
-        // from one animation to the next.
-        spineboy.state.data.defaultMix = 0.2;
-
         // Center the spine object on screen.
-        spineboy.x = window.innerWidth / 2;
-        spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
+        cloudPot.x = window.innerWidth / 2;
+        cloudPot.y = window.innerHeight / 2 + cloudPot.getBounds().height / 4;
 
-        // Set animation "cape-follow-example" on track 0, looped.
-        spineboy.state.setAnimation(0, "run", true);
+        // Set animation "playing-in-the-rain" on track 0, looped.
+        cloudPot.state.setAnimation(0, "playing-in-the-rain", true);
 
         // Add the display object to the stage.
-        app.stage.addChild(spineboy);
+        app.stage.addChild(cloudPot);
     });
 </script>
 
-<h1>SpineBoy with Pixi.js & SvelteKit</h1>
+<h1>Physics 4</h1>
