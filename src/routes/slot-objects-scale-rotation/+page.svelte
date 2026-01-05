@@ -62,7 +62,7 @@ bounds:0,0,100,100`;
     const slotPng =
         "data:image/png;base64,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";
 
-    const app = new Application();
+    let app: Application | null = $state(null);
     let parentBone: Bone | null = $state(null);
     let parent2Bone: Bone | null = $state(null);
     let bone: Bone | null = $state(null);
@@ -100,6 +100,7 @@ bounds:0,0,100,100`;
     });
 
     onMount(async () => {
+        app = new Application();
         await app.init({
             width: window.innerWidth,
             height: window.innerHeight,
@@ -144,6 +145,17 @@ bounds:0,0,100,100`;
         parentBone = spineGO.skeleton.findBone("pivot");
         parent2Bone = spineGO.skeleton.findBone("pivot2");
         bone = spineGO.skeleton.findBone("replaceMe");
+    });
+
+    onMount(() => {
+        return () => {
+            if (app) {
+                document.body.removeChild(app.canvas);
+                app.destroy();
+                app = null;
+                Assets.reset();
+            }
+        };
     });
 </script>
 

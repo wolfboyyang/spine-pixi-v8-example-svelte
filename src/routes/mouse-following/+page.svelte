@@ -8,9 +8,10 @@
     import { Spine, Vector2 } from "@esotericsoftware/spine-pixi-v8";
     import { onMount } from "svelte";
 
-    const app = new Application();
+    let app: Application | null = $state(null);
 
     onMount(async () => {
+        app = new Application();
         await app.init({
             width: window.innerWidth,
             height: window.innerHeight,
@@ -97,6 +98,17 @@
                 // Set the crosshair bone's position to the mouse position
                 crosshairBone.x = position.x;
                 crosshairBone.y = position.y;
+            }
+        };
+    });
+
+    onMount(() => {
+        return () => {
+            if (app) {
+                document.body.removeChild(app.canvas);
+                app.destroy();
+                app = null;
+                Assets.reset();
             }
         };
     });

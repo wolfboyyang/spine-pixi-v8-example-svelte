@@ -3,9 +3,10 @@
     import { Spine, type Slot } from "@esotericsoftware/spine-pixi-v8";
     import { onMount } from "svelte";
 
-    const app = new Application();
+    let app: Application | null = $state(null);
 
     onMount(async () => {
+        app = new Application();
         await app.init({
             width: window.innerWidth,
             height: window.innerHeight,
@@ -148,6 +149,17 @@
             foot1.addChild(tooth3);
             spineboy.addSlotObject("rear-foot", foot1);
         }, 11000);
+    });
+
+    onMount(() => {
+        return () => {
+            if (app) {
+                document.body.removeChild(app.canvas);
+                app.destroy();
+                app = null;
+                Assets.reset();
+            }
+        };
     });
 </script>
 

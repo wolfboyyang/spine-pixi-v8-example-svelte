@@ -8,9 +8,10 @@
     } from "@esotericsoftware/spine-pixi-v8";
     import { onMount } from "svelte";
 
-    const app = new Application();
+    let app: Application | null = $state(null);
 
     onMount(async () => {
+        app = new Application();
         await app.init({
             width: window.innerWidth,
             height: window.innerHeight,
@@ -111,11 +112,11 @@
             spineboy.x = x;
             spineboy.y =
                 70 * scaleFactor + (window.innerHeight / 10) * (1 + 2 * i);
-            app.stage.addChild(spineboy);
+            if (app) app.stage.addChild(spineboy);
 
             // yellow rectangle to show bounds
             const graphics = new Graphics();
-            app.stage.addChild(graphics);
+            if (app) app.stage.addChild(graphics);
 
             // text
             const basicText = new Text({
@@ -130,7 +131,7 @@
             basicText.x = x + scaledMaxHeight + 0 * scaleFactor;
             basicText.y = scaledMaxHeight * (i + 0.5);
             basicText.anchor.set(0, 0.5);
-            app.stage.addChild(basicText);
+            if (app) app.stage.addChild(basicText);
 
             // pointer events
             spineboy.eventMode = "static";
@@ -151,6 +152,17 @@
                     .fill({ color: 0xff0000, alpha: pointerOn[i] ? 0.2 : 0 });
             });
         });
+    });
+
+    onMount(() => {
+        return () => {
+            if (app) {
+                document.body.removeChild(app.canvas);
+                app.destroy();
+                app = null;
+                Assets.reset();
+            }
+        };
     });
 </script>
 

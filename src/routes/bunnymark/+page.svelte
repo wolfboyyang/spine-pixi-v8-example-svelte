@@ -3,7 +3,7 @@
     import { Spine } from "@esotericsoftware/spine-pixi-v8";
     import { onMount } from "svelte";
 
-    const app = new Application();
+    let app: Application | null = $state(null);
     const totalBunnies = 10;
 
     class BunnyV8 {
@@ -80,6 +80,7 @@
     }
 
     onMount(async () => {
+        app = new Application();
         await app.init({
             width: window.innerWidth,
             height: window.innerHeight,
@@ -116,7 +117,7 @@
 
             bunny.reset();
 
-            app.stage.addChild(bunny.view);
+            if (app) app.stage.addChild(bunny.view);
             bunnies.push(bunny);
         }
         for (let i = 0; i < totalBunnies; i++) {
@@ -138,11 +139,24 @@
 
             // bunnies[0].view.visible = !bunnies[0].view.visible;
 
-            app.render();
-            requestAnimationFrame(renderUpdate);
+            if (app) {
+                app.render();
+                requestAnimationFrame(renderUpdate);
+            }
         }
 
         renderUpdate();
+    });
+
+    onMount(() => {
+        return () => {
+            if (app) {
+                document.body.removeChild(app.canvas);
+                app.destroy();
+                app = null;
+                Assets.reset();
+            }
+        };
     });
 </script>
 

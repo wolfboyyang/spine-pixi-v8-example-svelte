@@ -3,9 +3,10 @@
     import { Spine } from "@esotericsoftware/spine-pixi-v8";
     import { onMount } from "svelte";
 
-    const app = new Application();
+    let app: Application | null = $state(null);
 
     onMount(async () => {
+        app = new Application();
         await app.init({
             width: window.innerWidth,
             height: window.innerHeight,
@@ -102,6 +103,17 @@
             (window.innerWidth / 3) * 2,
             window.innerHeight / 2,
         );
+    });
+
+    onMount(() => {
+        return () => {
+            if (app) {
+                document.body.removeChild(app.canvas);
+                app.destroy();
+                app = null;
+                Assets.reset();
+            }
+        };
     });
 </script>
 

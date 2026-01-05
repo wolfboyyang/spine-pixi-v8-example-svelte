@@ -3,9 +3,10 @@
     import { Spine } from "@esotericsoftware/spine-pixi-v8";
     import { onMount } from "svelte";
 
-    const app = new Application();
+    let app: Application | null = $state(null);
 
     onMount(async () => {
+        app = new Application();
         await app.init({
             width: window.innerWidth,
             height: window.innerHeight,
@@ -21,37 +22,37 @@
 
         // Pre-load the skeleton data and atlas. You can also load .json skeleton data.
         Assets.add({
-            alias: "spineboyData",
+            alias: "dragonData",
             src: "/assets/dragon-ess.skel",
         });
         Assets.add({
-            alias: "spineboyAtlas",
+            alias: "dragonAtlas",
             src: "/assets/dragon-ess.atlas",
         });
         Assets.add({
-            alias: "spineboyData2",
+            alias: "dragonData2",
             src: "/assets/dragon-ess.skel",
         });
         Assets.add({
-            alias: "spineboyAtlas2",
+            alias: "dragonAtlas2",
             src: "/assets/dragon-ess.atlas",
         });
         await Assets.load([
-            "spineboyData",
-            "spineboyAtlas",
-            "spineboyData",
-            "spineboyAtlas2",
+            "dragonData",
+            "dragonAtlas",
+            "dragonData",
+            "dragonAtlas2",
         ]);
 
         // Create the spine display object
         const spineboy = Spine.from({
-            skeleton: "spineboyData",
-            atlas: "spineboyAtlas",
+            skeleton: "dragonData",
+            atlas: "dragonAtlas",
             scale: 0.5,
         });
         const spineboy2 = Spine.from({
-            skeleton: "spineboyData",
-            atlas: "spineboyAtlas",
+            skeleton: "dragonData",
+            atlas: "dragonAtlas",
             scale: 0.5,
         });
         spineboy.autoUpdate = false;
@@ -81,6 +82,17 @@
             spineboy.update(_delta.deltaTime / 100);
             spineboy2.update(_delta.deltaTime / 100);
         });
+    });
+
+    onMount(() => {
+        return () => {
+            if (app) {
+                document.body.removeChild(app.canvas);
+                app.destroy();
+                app = null;
+                Assets.reset();
+            }
+        };
     });
 </script>
 

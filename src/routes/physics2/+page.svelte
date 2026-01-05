@@ -3,9 +3,10 @@
     import { Spine, Vector2 } from "@esotericsoftware/spine-pixi-v8";
     import { onMount } from "svelte";
 
-    const app = new Application();
+    let app: Application | null = $state(null);
 
     onMount(async () => {
+        app = new Application();
         await app.init({
             width: window.innerWidth,
             height: window.innerHeight,
@@ -129,7 +130,7 @@
                 document.exitFullscreen();
                 textButton.text = "Fullscreen";
             } else {
-                app.renderer.canvas.requestFullscreen();
+                if (app) app.renderer.canvas.requestFullscreen();
                 textButton.text = "Windowed";
             }
             fsEnabled = !fsEnabled;
@@ -138,11 +139,24 @@
         // app.ticker.maxFPS = 60;
         app.ticker.add(() => {
             // Get the current FPS value from the ticker and round it
-            const fps = app.ticker.FPS.toFixed(0);
+            if (app) {
+                const fps = app.ticker.FPS.toFixed(0);
 
-            // Update the text content
-            textFps.text = `${fps} fps`;
+                // Update the text content
+                textFps.text = `${fps} fps`;
+            }
         });
+    });
+
+    onMount(() => {
+        return () => {
+            if (app) {
+                document.body.removeChild(app.canvas);
+                app.destroy();
+                app = null;
+                Assets.reset();
+            }
+        };
     });
 </script>
 

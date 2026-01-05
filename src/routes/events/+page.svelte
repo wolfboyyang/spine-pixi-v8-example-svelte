@@ -1,10 +1,12 @@
 <script lang="ts">
     import { Application, Assets } from "pixi.js";
-    import { Spine } from "@esotericsoftware/spine-pixi-v8";
+    import { Spine, type TrackEntry } from "@esotericsoftware/spine-pixi-v8";
     import { onMount } from "svelte";
 
     let message: string[] = $state([]);
-    const app = new Application();
+    let app: Application | null = $state(null);
+    let spineboy: Spine | null = $state(null);
+    let trackEntry: TrackEntry | null = $state(null);
 
     function log(text: string) {
         message.push(text);
@@ -12,6 +14,7 @@
     }
 
     onMount(async () => {
+        app = new Application();
         await app.init({
             width: window.innerWidth,
             height: window.innerHeight,
@@ -34,7 +37,7 @@
         await Assets.load(["spineboyData", "spineboyAtlas"]);
 
         // Create the spine display object
-        const spineboy = Spine.from({
+        spineboy = Spine.from({
             atlas: "spineboyAtlas",
             skeleton: "spineboyData",
             scale: 0.5,
@@ -49,7 +52,9 @@
         spineboy.y = window.innerHeight / 2 + spineboy.getBounds().height / 2;
 
         // Set animation "run" on track 0, looped.
-        spineboy.state.setAnimation(0, "run", true);
+        if (spineboy.state.data.skeletonData.findAnimation("run")) {
+            spineboy.state.setAnimation(0, "run", true);
+        }
 
         // Set callbacks to receive animation state events.
         spineboy.state.addListener({
@@ -65,7 +70,7 @@
 
         // Add a custom event listener along with an
         // unlooped animation to see the custom event logged.
-        const trackEntry = spineboy.state.addAnimation(0, "walk", false, 3);
+        trackEntry = spineboy.state.addAnimation(0, "walk", false, 3);
         trackEntry.listener = {
             event: (entry, event) =>
                 log(
@@ -77,6 +82,26 @@
 
         // Add the display object to the stage.
         app.stage.addChild(spineboy);
+    });
+
+    onMount(() => {
+        return () => {
+            if (app) {
+                if (trackEntry) {
+                    trackEntry.listener = null;
+                    trackEntry = null;
+                }
+                document.body.removeChild(app.canvas);
+                app.destroy();
+                app = null;
+                if (spineboy) {
+                    spineboy.removeAllListeners();
+                    spineboy.destroy();
+                    spineboy = null;
+                }
+                Assets.reset();
+            }
+        };
     });
 </script>
 
